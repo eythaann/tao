@@ -1101,6 +1101,19 @@ unsafe fn public_window_callback_inner<T: 'static>(
       }
     }
 
+    win32wm::WM_NCPAINT => {
+      let window_state = subclass_input.window_state.lock();
+      let is_decorated = window_state
+        .window_flags()
+        .contains(WindowFlags::MARKER_DECORATIONS);
+
+      result = if is_decorated {
+        ProcResult::DefWindowProc
+      } else {
+        ProcResult::Value(LRESULT(0))
+      };
+    }
+
     win32wm::WM_ERASEBKGND => {
       let w = subclass_input.window_state.lock();
       if let Some(color) = w.background_color {
@@ -1786,7 +1799,17 @@ unsafe fn public_window_callback_inner<T: 'static>(
           lose_active_focus(window, subclass_input);
         }
       }
-      result = ProcResult::DefWindowProc;
+
+      let window_state = subclass_input.window_state.lock();
+      let is_decorated = window_state
+        .window_flags()
+        .contains(WindowFlags::MARKER_DECORATIONS);
+
+      result = if is_decorated || IsIconic(window).as_bool() {
+        ProcResult::DefWindowProc
+      } else {
+        ProcResult::Value(LRESULT(0))
+      };
     }
 
     win32wm::WM_SETFOCUS => {
