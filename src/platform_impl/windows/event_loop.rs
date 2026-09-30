@@ -1755,10 +1755,12 @@ unsafe fn public_window_callback_inner<T: 'static>(
         .window_flags()
         .contains(WindowFlags::MARKER_DECORATIONS);
 
+      // returning FALSE on deactivation (wparam == FALSE) prevents the activation change,
+      // so TRUE is returned to skip only the non-client painting.
       result = if is_decorated || IsIconic(window).as_bool() {
         ProcResult::DefWindowProc
       } else {
-        ProcResult::Value(LRESULT(0))
+        ProcResult::Value(LRESULT(1))
       };
     }
 
