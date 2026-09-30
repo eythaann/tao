@@ -1040,7 +1040,7 @@ unsafe fn public_window_callback_inner<T: 'static>(
     }
 
     win32wm::WM_NCPAINT => {
-      let window_state = subclass_input.window_state.lock();
+      let window_state = userdata.window_state.lock();
       let is_decorated = window_state
         .window_flags()
         .contains(WindowFlags::MARKER_DECORATIONS);
@@ -1750,7 +1750,7 @@ unsafe fn public_window_callback_inner<T: 'static>(
         }
       }
 
-      let window_state = subclass_input.window_state.lock();
+      let window_state = userdata.window_state.lock();
       let is_decorated = window_state
         .window_flags()
         .contains(WindowFlags::MARKER_DECORATIONS);

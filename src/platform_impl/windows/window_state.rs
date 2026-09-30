@@ -466,7 +466,9 @@ impl WindowFlags {
       unsafe {
         let _ = ShowWindow(
           window,
-          if old.contains(WindowFlags::MARKER_DONT_FOCUS) {
+          // `SW_SHOW` activates the window even with `WS_EX_NOACTIVATE`,
+          // so non focusable windows must never be shown with it.
+          if old.contains(WindowFlags::MARKER_DONT_FOCUS) || !new.contains(WindowFlags::FOCUSABLE) {
             SW_SHOWNOACTIVATE
           } else {
             SW_SHOW
